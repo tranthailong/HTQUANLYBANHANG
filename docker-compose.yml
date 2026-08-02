@@ -3,11 +3,11 @@ version: '3.8'
 services:
   db:
     image: mysql:8.0
-    container_name: sales_mysql_db
+    container_name: sale_management_db
     restart: always
     environment:
-      MYSQL_DATABASE: htquanlybanhang
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: sale_management
+      MYSQL_ROOT_PASSWORD: root123
     ports:
       - "3306:3306"
     volumes:
@@ -15,17 +15,17 @@ services:
 
   app:
     build: .
-    container_name: sales_spring_app
+    container_name: htquanlybanhang_app
     restart: always
     ports:
-      - "8080:8080"
+      - "6699:6699"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/sale_management?useSSL=false&serverTimezone=Asia/Ho_Chi_Minh&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root123
+      - SERVER_PORT=6699
     depends_on:
       - db
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/htquanlybanhang?useSSL=false&serverTimezone=UTC
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=root
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
 
 volumes:
   mysql_data:

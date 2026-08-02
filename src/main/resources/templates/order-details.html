@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi Tiết Đơn Hàng - Hệ Thống Quản Lý Bán Hàng</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/order-details.css">
+</head>
+<body class="bg-gray-950 text-gray-100 font-sans antialiased">
+
+<div class="flex h-screen overflow-hidden">
+
+    <!-- SIDEBAR BÊN TRÁI -->
+    <aside class="w-64 bg-gray-900 border-r border-gray-800 flex flex-col justify-between hidden md:flex">
+        <div>
+            <div class="h-16 flex items-center px-6 border-b border-gray-800">
+                <h1 class="font-bold text-xs tracking-wider uppercase text-indigo-400">HỆ THỐNG QUẢN LÝ BÁN HÀNG</h1>
+            </div>
+            <nav class="p-4 space-y-1">
+                <a href="/index.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white transition"><i class="fa-solid fa-chart-pie w-5"></i> Dashboard</a>
+                <a href="/products.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white transition"><i class="fa-solid fa-box w-5"></i> Products</a>
+                <a href="/categories.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white transition"><i class="fa-solid fa-tags w-5"></i> Categories</a>
+                <a href="/customers.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white transition"><i class="fa-solid fa-users w-5"></i> Customers</a>
+                <a href="/orders.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white transition"><i class="fa-solid fa-file-invoice-dollar w-5"></i> Orders</a>
+                <a href="/order-details.html" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-indigo-600 text-white font-medium transition"><i class="fa-solid fa-list-check w-5"></i> OrderDetail</a>
+            </nav>
+        </div>
+        <div class="p-4 border-t border-gray-800 text-xs text-gray-500 text-center">
+            Spring Boot Backend connected
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+
+        <!-- TOPBAR -->
+        <header class="h-16 bg-gray-900 border-b border-gray-800 flex items-center justify-between px-6 z-10">
+            <div id="topbar-title" class="text-sm font-semibold text-gray-300">Chi tiết đơn hàng</div>
+            <div class="flex items-center gap-3 bg-gray-800 px-3 py-1.5 rounded-full border border-gray-700">
+                <div class="w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold">
+                    <i class="fa-solid fa-user text-sm"></i>
+                </div>
+                <span class="text-sm font-medium text-gray-200">Admin</span>
+            </div>
+        </header>
+
+        <!-- PAGE CONTENT -->
+        <main class="flex-1 overflow-y-auto p-6 space-y-6 bg-gray-950">
+
+            <!-- THANH CHỌN ĐƠN HÀNG TRỰC TIẾP TRÊN TRANG -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-gray-900 p-5 rounded-2xl border border-gray-800">
+                <div class="flex items-center gap-3 w-full sm:w-auto">
+                    <h2 class="text-lg font-bold text-white whitespace-nowrap">Chọn đơn hàng:</h2>
+                    <select id="select-order-dropdown" onchange="onSelectOrderChange(this.value)" class="bg-gray-950 border border-gray-800 rounded-xl px-4 py-2 text-sm text-gray-200 focus:outline-none focus:border-indigo-500 w-full sm:w-72">
+                        <option value="">-- Đang tải danh sách đơn hàng... --</option>
+                    </select>
+                </div>
+                <a href="/orders.html" class="bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2 rounded-xl text-sm transition flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i> Quản lý đơn hàng
+                </a>
+            </div>
+
+            <!-- THÔNG TIN KHÁCH HÀNG & TRẠNG THÁI -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Box Thông tin khách -->
+                <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-3 shadow-xl">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-indigo-400">Thông tin khách hàng</h3>
+                    <div class="text-sm space-y-1">
+                        <p class="text-gray-200 font-medium text-base" id="customer-name">Vui lòng chọn đơn hàng...</p>
+                        <p class="text-gray-400" id="customer-phone">SĐT: ---</p>
+                        <p class="text-gray-400" id="customer-email">Email: ---</p>
+                        <p class="text-gray-400" id="customer-address">Địa chỉ: ---</p>
+                    </div>
+                </div>
+
+                <!-- Box Trạng thái đơn hàng -->
+                <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-3 shadow-xl flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-indigo-400 mb-2">Trạng thái đơn hàng</h3>
+                        <div class="flex items-center gap-3">
+                            <select id="order-status-select" class="bg-gray-950 border border-gray-800 rounded-xl px-4 py-2 text-sm text-gray-200 focus:outline-none focus:border-indigo-500">
+                                <option value="PENDING">Chờ xử lý</option>
+                                <option value="PROCESSING">Đang chuẩn bị hàng</option>
+                                <option value="COMPLETED">Đã hoàn thành</option>
+                                <option value="CANCELLED">Đã hủy</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <button onclick="updateOrderStatus()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-5 py-2 rounded-xl text-sm transition shadow-lg shadow-indigo-600/20">
+                            <i class="fa-solid fa-floppy-disk mr-1.5"></i> Cập nhật trạng thái
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BẢNG SẢN PHẨM TRONG ĐƠN HÀNG -->
+            <div class="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-xl space-y-4 p-5">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-indigo-400">Sản phẩm trong đơn</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                        <tr class="border-b border-gray-800 text-xs text-gray-400 uppercase bg-gray-950/40">
+                            <th class="py-3 px-4">Sản phẩm</th>
+                            <th class="py-3 px-4 text-center">Số lượng</th>
+                            <th class="py-3 px-4 text-right">Giá</th>
+                            <th class="py-3 px-4 text-right">Thành tiền</th>
+                        </tr>
+                        </thead>
+                        <tbody id="order-items-table-body" class="divide-y divide-gray-800/60 text-sm">
+                        <tr>
+                            <td colspan="4" class="py-6 text-center text-gray-500">Vui lòng chọn một đơn hàng phía trên</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- TỔNG TIỀN -->
+                <div class="flex justify-end pt-4 border-t border-gray-800">
+                    <div class="text-right space-y-1">
+                        <span class="text-gray-400 text-sm">Tổng tiền thanh toán:</span>
+                        <div id="order-total-amount" class="text-2xl font-bold text-emerald-400">0đ</div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<!-- Kết nối file JS riêng biệt -->
+<script src="/jss/order-details.js"></script>
+</body>
+</html>
