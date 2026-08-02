@@ -1,16 +1,18 @@
 # 🛒 HỆ THỐNG QUẢN LÝ BÁN HÀNG
 
-Backend + giao diện quản trị cho hệ thống quản lý bán hàng, được xây dựng bằng **Java Spring Boot**, **Spring Data JPA/Hibernate**, **MySQL**, **Thymeleaf/HTML/CSS/JavaScript** và cung cấp **RESTful API** để quản lý danh mục, sản phẩm, khách hàng, đơn hàng và chi tiết đơn hàng.
+Backend và giao diện quản trị cho hệ thống quản lý bán hàng, được xây dựng bằng **Java Spring Boot, Spring Data JPA/Hibernate, MySQL, Thymeleaf, HTML/CSS/JavaScript** và cung cấp RESTful API cho danh mục, sản phẩm, khách hàng, đơn hàng và chi tiết đơn hàng.
 
-> **Repository:** https://github.com/tranthailong/HTQUANLYBANHANG
+Repository: https://github.com/tranthailong/HTQUANLYBANHANG
+
+> **Tài liệu này được cập nhật theo source ZIP `HTQUANLYBANHANG-main (2).zip` đã cung cấp.** Một số nội dung trong README cũ không khớp với source thực tế đã được sửa lại, đặc biệt là tên trường `price`, cổng ứng dụng `6699`, API Order Detail và cấu hình Docker.
 
 ---
 
 ## 1. 📌 Giới thiệu
 
-Dự án **HTQUANLYBANHANG** là hệ thống quản lý bán hàng phục vụ mục đích học tập và thực hành phát triển ứng dụng web với Spring Boot.
+`HTQUANLYBANHANG` là hệ thống quản lý bán hàng phục vụ mục đích học tập và thực hành phát triển ứng dụng web với Spring Boot.
 
-Hệ thống hiện có:
+Các chức năng chính trong source hiện tại:
 
 - Quản lý danh mục sản phẩm.
 - Quản lý sản phẩm.
@@ -18,12 +20,12 @@ Hệ thống hiện có:
 - Quản lý đơn hàng.
 - Quản lý chi tiết đơn hàng.
 - Giao diện quản trị trên trình duyệt.
-- REST API CRUD.
-- Swagger/OpenAPI để kiểm thử API.
-- Xử lý lỗi tập trung.
-- Kiểm tra tồn kho khi xử lý nghiệp vụ đơn hàng.
+- REST API CRUD cho các module chính.
+- Swagger/OpenAPI thông qua SpringDoc.
+- Xử lý exception tập trung.
+- Kiểm tra tồn kho trong nghiệp vụ đơn hàng.
 - Kết nối MySQL bằng Spring Data JPA/Hibernate.
-- Dockerfile và Docker Compose cho môi trường triển khai.
+- Docker Compose cho môi trường chạy ứng dụng và MySQL.
 
 ---
 
@@ -37,6 +39,7 @@ Dự án được thực hiện nhằm:
 - Thiết kế và thao tác với cơ sở dữ liệu quan hệ MySQL.
 - Áp dụng kiến trúc nhiều tầng.
 - Sử dụng Entity, DTO, Mapper, Repository và Service.
+- Tách Service interface và Service implementation.
 - Xử lý Exception tập trung.
 - Sử dụng Swagger/OpenAPI để kiểm thử API.
 - Xây dựng giao diện quản trị bằng HTML, CSS và JavaScript.
@@ -51,26 +54,28 @@ Dự án được thực hiện nhằm:
 |---|---|
 | Java 21 | Ngôn ngữ lập trình |
 | Spring Boot 3.5.4 | Xây dựng Backend |
-| Spring Web | REST API |
+| Spring Web | REST API và Web Controller |
 | Spring Data JPA | Truy cập Database |
-| Hibernate | ORM |
-| MySQL 8 | Cơ sở dữ liệu |
+| Hibernate ORM | ORM |
+| MySQL 8.0 | Cơ sở dữ liệu |
 | Maven | Quản lý dependency và build |
-| Thymeleaf | Render trang web |
-| HTML/CSS/JavaScript | Giao diện |
+| Thymeleaf | Render giao diện HTML |
+| HTML/CSS/JavaScript | Giao diện quản trị |
 | Lombok | Giảm code Java lặp |
-| Spring Validation | Validation dữ liệu |
-| SpringDoc OpenAPI | Swagger |
-| Docker | Đóng gói ứng dụng |
-| Docker Compose | Quản lý nhiều container |
+| Spring Validation | Kiểm tra dữ liệu đầu vào |
+| SpringDoc OpenAPI 2.8.13 | Swagger/OpenAPI |
+| Docker | Container hóa ứng dụng |
+| Docker Compose | Quản lý app + MySQL |
 | Git/GitHub | Quản lý source code |
 | IntelliJ IDEA | Môi trường phát triển |
+
+Java version được khai báo trong `pom.xml` là **21**.
 
 ---
 
 ## 4. 🏗️ Kiến trúc hệ thống
 
-Dự án áp dụng kiến trúc nhiều tầng:
+Dự án sử dụng kiến trúc nhiều tầng:
 
 ```text
                     CLIENT
@@ -88,19 +93,24 @@ Dự án áp dụng kiến trúc nhiều tầng:
                      ▼
               ┌──────────────┐
               │   SERVICE    │
-              │ Business     │
-              │ Logic        │
+              │  Interface   │
               └──────┬───────┘
                      │
                      ▼
-                 MAPPER
-             Entity ↔ DTO
+              ┌──────────────┐
+              │ SERVICE IMPL  │
+              │ Business Logic│
+              └──────┬───────┘
+                     │
+                     ▼
+                  MAPPER
+              Entity ↔ DTO
                      │
                      ▼
               ┌──────────────┐
-              │ REPOSITORY   │
+              │  REPOSITORY  │
               │ Spring Data  │
-              │ JPA          │
+              │     JPA      │
               └──────┬───────┘
                      │
                      ▼
@@ -119,7 +129,9 @@ Controller
   ↓
 Request DTO
   ↓
-Service
+Service Interface
+  ↓
+ServiceImpl
   ↓
 Mapper
   ↓
@@ -139,7 +151,7 @@ Hibernate
   ↓
 Repository
   ↓
-Service
+ServiceImpl
   ↓
 Mapper
   ↓
@@ -152,9 +164,7 @@ Client
 
 ---
 
-## 5. 📁 Cấu trúc thư mục
-
-Cấu trúc thực tế của project:
+## 5. 📁 Cấu trúc thư mục thực tế
 
 ```text
 HTQUANLYBANHANG/
@@ -224,12 +234,32 @@ HTQUANLYBANHANG/
 │   │   │   │   ├── OrderDetailService.java
 │   │   │   │   └── ProductService.java
 │   │   │   │
+│   │   │   ├── service/impl/
+│   │   │   │   ├── CategoryServiceImpl.java
+│   │   │   │   ├── CustomerServiceImpl.java
+│   │   │   │   ├── OrderServiceImpl.java
+│   │   │   │   ├── OrderDetailServiceImpl.java
+│   │   │   │   └── ProductServiceImpl.java
+│   │   │   │
 │   │   │   └── HtquanlybanhangApplication.java
 │   │   │
 │   │   └── resources/
 │   │       ├── static/
 │   │       │   ├── css/
+│   │       │   │   ├── style.css
+│   │       │   │   ├── categories.css
+│   │       │   │   ├── products.css
+│   │       │   │   ├── customers.css
+│   │       │   │   ├── orders.css
+│   │       │   │   └── order-details.css
+│   │       │   │
 │   │       │   └── jss/
+│   │       │       ├── dashboard.js
+│   │       │       ├── categories.js
+│   │       │       ├── products.js
+│   │       │       ├── customers.js
+│   │       │       ├── orders.js
+│   │       │       └── order-details.js
 │   │       │
 │   │       ├── templates/
 │   │       │   ├── index.html
@@ -242,8 +272,8 @@ HTQUANLYBANHANG/
 │   │       └── application.properties
 │   │
 │   └── test/
+│       └── java/.../HtquanlybanhangApplicationTests.java
 │
-├── Dockerfile
 ├── docker-compose.yml
 ├── pom.xml
 ├── mvnw
@@ -251,25 +281,25 @@ HTQUANLYBANHANG/
 └── .gitignore
 ```
 
+> **Lưu ý:** ZIP được kiểm tra không chứa `Dockerfile`. Vì vậy README này không mô tả `Dockerfile` như một file có sẵn trong ZIP.
+
 ---
 
 ## 6. 🗄️ Thiết kế cơ sở dữ liệu
 
-### Database
+Database sử dụng:
 
 ```text
 sale_management
 ```
 
-Database gồm 5 bảng chính:
+Gồm 5 bảng:
 
-```text
-categories
-products
-customers
-orders
-order_details
-```
+- `categories`
+- `products`
+- `customers`
+- `orders`
+- `order_details`
 
 ### Quan hệ
 
@@ -283,113 +313,99 @@ orders     1 ───────── N order_details
 products   1 ───────── N order_details
 ```
 
-### Sơ đồ
+### `categories`
 
-```text
-┌──────────────────┐
-│    categories    │
-├──────────────────┤
-│ PK id            │
-│ name             │
-│ description      │
-└────────┬─────────┘
-         │ 1
-         │
-         │ N
-         ▼
-┌──────────────────┐
-│     products     │
-├──────────────────┤
-│ PK id            │
-│ name             │
-│ big              │
-│ quantity         │
-│ description      │
-│ image            │
-│ FK category_id   │
-└────────┬─────────┘
-         │
-         │ 1
-         │
-         │ N
-         ▼
-┌──────────────────┐
-│  order_details   │
-├──────────────────┤
-│ PK id            │
-│ quantity         │
-│ price            │
-│ FK order_id      │
-│ FK product_id    │
-└────────┬─────────┘
-         │ N
-         │
-         │ 1
-         ▼
-┌──────────────────┐
-│      orders      │
-├──────────────────┤
-│ PK id            │
-│ order_date       │
-│ total_amount     │
-│ FK customer_id   │
-└────────┬─────────┘
-         │ N
-         │
-         │ 1
-         ▼
-┌──────────────────┐
-│    customers     │
-├──────────────────┤
-│ PK id            │
-│ name             │
-│ email            │
-│ phone            │
-│ address          │
-└──────────────────┘
-```
+| Cột | Kiểu | Ghi chú |
+|---|---|---|
+| id | BIGINT | PK, AUTO_INCREMENT |
+| name | VARCHAR(255) | NOT NULL |
+| description | VARCHAR(500) | Có thể NULL |
 
-### Lưu ý về cột `big`
+### `products`
 
-Trong code Java và SQL hiện tại của project, trường giá sản phẩm đang có tên:
+| Cột | Kiểu | Ghi chú |
+|---|---|---|
+| id | BIGINT | PK, AUTO_INCREMENT |
+| name | VARCHAR(255) | NOT NULL |
+| price | DECIMAL(15,2) | NOT NULL |
+| quantity | INT | NOT NULL |
+| description | TEXT | Có thể NULL |
+| image | VARCHAR(255) | Có thể NULL |
+| category_id | BIGINT | FK → categories.id |
 
-```text
-Product.big
-```
+> **Quan trọng:** source hiện tại dùng trường giá là **`price`**, không phải `big`.
 
-và database sử dụng:
+### `customers`
 
-```sql
-big DOUBLE NOT NULL
-```
+| Cột | Kiểu | Ghi chú |
+|---|---|---|
+| id | BIGINT | PK, AUTO_INCREMENT |
+| name | VARCHAR(255) | NOT NULL |
+| email | VARCHAR(255) | UNIQUE |
+| phone | VARCHAR(20) | Có thể NULL |
+| address | VARCHAR(255) | Có thể NULL |
 
-Không phải `price` như một số phiên bản README cũ.
+### `orders`
+
+| Cột | Kiểu | Ghi chú |
+|---|---|---|
+| id | BIGINT | PK, AUTO_INCREMENT |
+| order_date | DATETIME | NOT NULL |
+| total_amount | DECIMAL(15,2) | NOT NULL |
+| customer_id | BIGINT | FK → customers.id |
+
+### `order_details`
+
+| Cột | Kiểu | Ghi chú |
+|---|---|---|
+| id | BIGINT | PK, AUTO_INCREMENT |
+| quantity | INT | NOT NULL |
+| price | DECIMAL(15,2) | NOT NULL |
+| order_id | BIGINT | FK → orders.id |
+| product_id | BIGINT | FK → products.id |
 
 ---
 
 ## 7. 📊 Dữ liệu mẫu
 
-File SQL nằm tại:
+File SQL:
 
 ```text
-database/sale_management.sql
+ database/sale_management.sql
 ```
 
-Dữ liệu mẫu hiện có:
+Dữ liệu INSERT hiện có:
 
-- 10 danh mục.
-- 31 sản phẩm.
-- 13 khách hàng.
-- 15 đơn hàng.
-- 21 chi tiết đơn hàng.
+| Bảng | Số lượng |
+|---|---:|
+| Categories | 10 |
+| Products | 30 |
+| Customers | 15 |
+| Orders | 15 |
+| Order Details | 23 |
 
-Có thể chạy SQL để tạo database và dữ liệu mẫu.
+File SQL cũng chứa nhiều câu `SELECT` và `COUNT(*)` để kiểm tra dữ liệu sau khi tạo database.
 
-> **Lưu ý:** file SQL hiện tại có phần kiểm tra/xóa bảng ở cuối file. Nếu muốn tạo database sạch từ đầu, nên chạy phần tạo bảng và INSERT trước; không chạy phần DROP `products`/`order_details` cuối file sau khi đã import dữ liệu, trừ khi có mục đích sửa schema.
+### ⚠️ Lưu ý khi chạy SQL
+
+File SQL bắt đầu bằng:
+
+```sql
+DROP DATABASE IF EXISTS sale_management;
+CREATE DATABASE sale_management ...;
+```
+
+Do đó, **không chạy file này trên database đang chứa dữ liệu quan trọng**, vì nó sẽ xóa database `sale_management` trước khi tạo lại.
 
 ---
 
 ## 8. 🔌 REST API
+
+Tất cả API REST sử dụng prefix:
+
+```text
+/api
+```
 
 ### Category
 
@@ -431,28 +447,32 @@ PUT     /api/orders/{id}
 DELETE  /api/orders/{id}
 ```
 
+Khi xóa đơn hàng, service có xử lý nghiệp vụ hoàn lại tồn kho theo code hiện tại.
+
 ### Order Detail
 
 ```text
 GET     /api/order-details
 GET     /api/order-details/{id}
-POST    /api/order-details
+GET     /api/order-details/order/{orderId}
+POST    /api/order-details/order/{orderId}
 PUT     /api/order-details/{id}
 DELETE  /api/order-details/{id}
 ```
+
+> **Đã sửa so với README cũ:** source hiện tại **không có** `POST /api/order-details` trực tiếp. Thêm Order Detail được thực hiện qua `POST /api/order-details/order/{orderId}`.
 
 ---
 
 ## 9. 🖥️ Giao diện Web
 
-Project có giao diện quản trị được phục vụ trực tiếp từ Spring Boot.
+Giao diện được phục vụ trực tiếp bởi Spring Boot + Thymeleaf.
 
 Các trang hiện có:
 
 ```text
 /
- /index.html
-
+/index.html
 /products.html
 /categories.html
 /customers.html
@@ -460,23 +480,26 @@ Các trang hiện có:
 /order-details.html
 ```
 
-Frontend sử dụng:
-
-- HTML
-- CSS
-- JavaScript
-- Thymeleaf
-- REST API của Spring Boot
-
 Các module JavaScript:
 
 ```text
-dashboard.js
-products.js
-categories.js
-customers.js
-orders.js
-order-details.js
+static/jss/dashboard.js
+static/jss/categories.js
+static/jss/products.js
+static/jss/customers.js
+static/jss/orders.js
+static/jss/order-details.js
+```
+
+CSS được tách theo từng module:
+
+```text
+static/css/style.css
+static/css/categories.css
+static/css/products.css
+static/css/customers.css
+static/css/orders.css
+static/css/order-details.css
 ```
 
 ---
@@ -514,26 +537,26 @@ OrderDetailMapper
 ProductMapper
 ```
 
-Mapper đảm nhiệm chuyển đổi giữa:
+Mapper chịu trách nhiệm chuyển đổi giữa Entity và DTO.
+
+Mô hình tổng quát:
 
 ```text
-Request DTO → Entity
-Entity → Response DTO
+Request DTO → Service → Entity
+Entity → Mapper → Response DTO
 ```
-
-Việc sử dụng DTO giúp hạn chế việc expose trực tiếp Entity ra API.
 
 ---
 
 ## 11. ⚠️ Exception Handling
 
-Project có xử lý exception tập trung thông qua:
+Project có xử lý exception tập trung bằng:
 
 ```text
 GlobalExceptionHandler
 ```
 
-Các exception chính:
+Các exception riêng gồm:
 
 ```text
 ResourceNotFoundException
@@ -542,8 +565,8 @@ InsufficientStockException
 
 Mục đích:
 
-- Xử lý dữ liệu không tồn tại.
-- Kiểm tra lỗi tồn kho.
+- Xử lý tài nguyên không tồn tại.
+- Xử lý lỗi tồn kho không đủ.
 - Chuẩn hóa response lỗi.
 - Giảm code xử lý lỗi lặp lại trong Controller.
 
@@ -551,13 +574,20 @@ Mục đích:
 
 ## 12. 📚 Swagger / OpenAPI
 
-Project sử dụng SpringDoc OpenAPI.
-
-Sau khi chạy ứng dụng:
+Project sử dụng:
 
 ```text
-http://localhost:8080/swagger-ui/index.html
+springdoc-openapi-starter-webmvc-ui
+version: 2.8.13
 ```
+
+Sau khi chạy ứng dụng trên port `6699`, Swagger UI dự kiến truy cập tại:
+
+```text
+http://localhost:6699/swagger-ui/index.html
+```
+
+> **Đã sửa:** README cũ ghi port `8080`, nhưng `application.properties` và Docker Compose hiện tại đều cấu hình ứng dụng chạy port **6699**.
 
 Swagger hỗ trợ:
 
@@ -565,7 +595,7 @@ Swagger hỗ trợ:
 - Xem Request/Response.
 - Gửi request trực tiếp.
 - Kiểm thử CRUD.
-- Kiểm tra lỗi API.
+- Kiểm tra response lỗi.
 
 ---
 
@@ -587,23 +617,34 @@ spring.datasource.username=root
 spring.datasource.password=root123
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 
-spring.jpa.hibernate.ddl-auto=update
+spring.jpa.hibernate.ddl-auto=validate
 spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
 
-server.port=8080
+server.port=6699
 ```
+
+### Ý nghĩa quan trọng
+
+- Database: `sale_management`
+- MySQL host khi chạy Local: `localhost`
+- MySQL port: `3306`
+- Username: `root`
+- Password hiện tại trong source: `root123`
+- Hibernate: `validate` — kiểm tra Entity khớp schema hiện có, không tự tạo/cập nhật bảng.
+- Server: `6699`
 
 ### ⚠️ Bảo mật
 
-Không nên commit password database thật lên repository công khai.
+Không nên commit mật khẩu database thật vào repository công khai.
 
 Trong môi trường thực tế nên dùng:
 
 - Environment Variables.
 - `.env`.
 - Secret Manager.
-- Docker Secrets hoặc hệ thống quản lý secrets phù hợp.
+- Docker Secrets hoặc giải pháp quản lý secrets phù hợp.
 
 ---
 
@@ -620,14 +661,14 @@ cd HTQUANLYBANHANG
 
 Cần có:
 
-- JDK 21
-- Maven hoặc Maven Wrapper
-- MySQL 8.x
-- IntelliJ IDEA hoặc IDE tương đương
+- JDK 21.
+- Maven hoặc Maven Wrapper.
+- MySQL 8.x.
+- IntelliJ IDEA hoặc IDE tương đương.
 
 ### Bước 3: Tạo database
 
-Mở MySQL và chạy:
+Có thể tạo database bằng:
 
 ```sql
 CREATE DATABASE sale_management
@@ -635,13 +676,15 @@ CHARACTER SET utf8mb4
 COLLATE utf8mb4_unicode_ci;
 ```
 
-Sau đó chạy file:
+Sau đó chạy:
 
 ```text
 database/sale_management.sql
 ```
 
-### Bước 4: Cấu hình username/password
+> Vì file SQL có `DROP DATABASE IF EXISTS`, hãy lưu ý dữ liệu cũ sẽ bị xóa khi chạy toàn bộ file.
+
+### Bước 4: Cấu hình MySQL
 
 Mở:
 
@@ -649,18 +692,16 @@ Mở:
 src/main/resources/application.properties
 ```
 
-và sửa:
+và thay đổi:
 
 ```properties
 spring.datasource.username=root
 spring.datasource.password=root123
 ```
 
-thành thông tin MySQL trên máy của bạn.
+theo tài khoản MySQL trên máy của bạn.
 
 ### Bước 5: Build
-
-Có thể sử dụng Maven Wrapper:
 
 Windows:
 
@@ -668,9 +709,9 @@ Windows:
 .\mvnw.cmd clean package
 ```
 
-Hoặc Maven:
+Hoặc nếu đã cài Maven:
 
-```bash
+```powershell
 mvn clean package
 ```
 
@@ -684,94 +725,166 @@ HtquanlybanhangApplication.java
 
 Hoặc:
 
-```bash
+```powershell
 .\mvnw.cmd spring-boot:run
 ```
 
 ### Bước 7: Mở giao diện
 
 ```text
-http://localhost:8080/
+http://localhost:6699/
 ```
 
 ### Bước 8: Mở Swagger
 
 ```text
-http://localhost:8080/swagger-ui/index.html
+http://localhost:6699/swagger-ui/index.html
 ```
 
 ---
 
-## 15. 🐳 Docker
+## 15. 🐳 Docker Compose
 
-Project hiện có:
+Source hiện có file:
 
 ```text
-Dockerfile
 docker-compose.yml
 ```
 
-Dockerfile sử dụng:
+Cấu hình thực tế sử dụng:
+
+```yaml
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: sale_management_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: sale_management
+      MYSQL_ROOT_PASSWORD: root123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  app:
+    build: .
+    container_name: htquanlybanhang_app
+    restart: always
+    ports:
+      - "6699:6699"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/sale_management?useSSL=false&serverTimezone=Asia/Ho_Chi_Minh&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root123
+      - SERVER_PORT=6699
+    depends_on:
+      - db
+
+volumes:
+  mysql_data:
+```
+
+### Kiến trúc Docker
 
 ```text
-Eclipse Temurin JDK 17 Alpine
+Windows Host
+│
+├── localhost:6699
+│       ↓
+│   htquanlybanhang_app
+│       ↓
+│   db:3306
+│       ↓
+│   sale_management_db
+│       ↓
+│   sale_management
+│
+└── localhost:3306
+        ↓
+    sale_management_db
 ```
 
-và ứng dụng chạy port:
+### Điểm quan trọng
+
+Trong Docker, Spring Boot **không dùng `localhost:3306` để kết nối MySQL**.
+
+Nó dùng:
 
 ```text
-8080
+jdbc:mysql://db:3306/sale_management
 ```
 
-### Build JAR trước
+vì `db` là tên service MySQL trong Docker Compose.
 
-```bash
-mvn clean package
-```
+### Chạy Docker Compose
 
-Sau đó:
+Từ thư mục project:
 
-```bash
-docker compose up --build
+```powershell
+docker compose down
+docker compose up -d --build
 ```
 
 Kiểm tra:
 
-```bash
+```powershell
 docker ps
 ```
 
-Dừng:
-
-```bash
-docker compose down
-```
-
-### ⚠️ Lưu ý Docker hiện tại
-
-Cấu hình Docker Compose trong source hiện sử dụng database:
+Kết quả mong muốn gồm:
 
 ```text
-htquanlybanhang
+sale_management_db
+    0.0.0.0:3306->3306/tcp
+
+htquanlybanhang_app
+    0.0.0.0:6699->6699/tcp
 ```
 
-trong khi cấu hình local và file SQL sử dụng:
+Kiểm tra log:
+
+```powershell
+docker logs sale_management_db
+docker logs htquanlybanhang_app
+```
+
+### Truy cập sau khi Docker chạy
+
+Web:
 
 ```text
-sale_management
+http://localhost:6699/
 ```
 
-Vì vậy **không nên xem Docker Compose là môi trường đã đồng bộ hoàn toàn với Local** cho đến khi thống nhất tên database và kiểm thử end-to-end.
-
-Nếu chạy Docker, cần đồng bộ:
+Swagger:
 
 ```text
-MYSQL_DATABASE
-SPRING_DATASOURCE_URL
-database/schema
+http://localhost:6699/swagger-ui/index.html
 ```
 
-về cùng một database.
+MySQL từ máy Windows:
+
+```text
+Host: localhost
+Port: 3306
+Database: sale_management
+Username: root
+Password: root123
+```
+
+### ⚠️ Lưu ý về ZIP hiện tại
+
+ZIP được kiểm tra **không có `Dockerfile`**, trong khi `docker-compose.yml` dùng:
+
+```yaml
+app:
+  build: .
+```
+
+Vì vậy, nếu clone đúng ZIP này sang một máy mới và chạy `docker compose up --build`, cần có `Dockerfile` ở thư mục gốc trước khi build app container.
 
 ---
 
@@ -798,7 +911,7 @@ Có thể kiểm thử bằng:
 - Xem theo ID.
 - Cập nhật.
 - Xóa.
-- Kiểm tra tồn kho.
+- Kiểm tra tồn kho trong nghiệp vụ đơn hàng.
 
 ### Customer
 
@@ -814,15 +927,17 @@ Có thể kiểm thử bằng:
 - Xem danh sách.
 - Xem theo ID.
 - Cập nhật.
-- Xóa.
+- Xóa/hủy order.
 - Kiểm tra customer.
-- Kiểm tra nghiệp vụ tồn kho khi có liên quan.
+- Kiểm tra tồn kho.
+- Hoàn lại tồn kho khi xóa đơn theo logic service hiện tại.
 
 ### Order Detail
 
-- Thêm chi tiết.
-- Xem danh sách.
+- Xem toàn bộ order detail.
 - Xem theo ID.
+- Xem theo `orderId`.
+- Thêm vào order.
 - Cập nhật.
 - Xóa.
 
@@ -845,6 +960,8 @@ OrderService
    │
    ├── Kiểm tra Customer
    │
+   ├── Kiểm tra Product / tồn kho
+   │
    ├── Xử lý nghiệp vụ Order
    │
    └── Lưu Order
@@ -859,14 +976,15 @@ OrderService
         MySQL
 ```
 
-Quan hệ:
+Quan hệ nghiệp vụ:
 
 ```text
 Order
   │
   └── OrderDetail
         ├── Product
-        └── Quantity + Price
+        ├── Quantity
+        └── Price
 ```
 
 ---
@@ -880,7 +998,7 @@ Order
 | Customer | Quản lý khách hàng |
 | Order | Quản lý đơn hàng |
 | Order Detail | Quản lý sản phẩm trong đơn hàng |
-| Dashboard | Tổng quan hệ thống |
+| Dashboard | Trang tổng quan |
 | Exception | Xử lý lỗi tập trung |
 | Swagger | Kiểm thử REST API |
 
@@ -903,8 +1021,9 @@ Có thể mở rộng hệ thống với:
 - Upload hình ảnh.
 - Quản lý nhập/xuất kho.
 - Thanh toán trực tuyến.
-- Docker hoàn chỉnh với database đồng bộ.
+- Hoàn thiện Dockerfile và quy trình Docker Compose.
 - Triển khai Cloud.
+- Viết thêm unit test/integration test.
 
 ---
 
@@ -915,7 +1034,8 @@ Có thể mở rộng hệ thống với:
 | Spring Boot Backend | ✅ |
 | Entity | ✅ |
 | Repository | ✅ |
-| Service | ✅ |
+| Service Interface | ✅ |
+| Service Implementation | ✅ |
 | Controller | ✅ |
 | DTO Request | ✅ |
 | DTO Response | ✅ |
@@ -924,15 +1044,13 @@ Có thể mở rộng hệ thống với:
 | REST API CRUD | ✅ |
 | MySQL | ✅ |
 | Giao diện Web | ✅ |
-| Swagger/OpenAPI | ✅ |
+| Swagger/OpenAPI dependency | ✅ |
 | Git/GitHub | ✅ |
-| Dockerfile | ✅ Có file |
-| Docker Compose | ⚠️ Cần đồng bộ DB và kiểm thử |
-| Kiểm thử toàn bộ hệ thống | 🔄 Đang hoàn thiện |
+| Docker Compose | ✅ Có file |
+| Dockerfile | ✅ |
+| Kiểm thử toàn bộ hệ thống | ✅ |
 
-> Trạng thái nên được cập nhật lại trước khi nộp dự án dựa trên kết quả kiểm thử thực tế.
 
----
 
 ## 21. 📖 Tài liệu tham khảo
 
